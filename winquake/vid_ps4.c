@@ -25,8 +25,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 viddef_t	vid;				// global video state
 
-#define	BASEWIDTH	1920
-#define	BASEHEIGHT	1080
+#define	BASEWIDTH	1280
+#define	BASEHEIGHT	720
 #define FRAMEDEPTH     4
 
 byte	vid_buffer[BASEWIDTH*BASEHEIGHT];
@@ -46,7 +46,7 @@ OrbisKernelEqueue flipQueue;
 size_t directMemAllocationSize;
 off_t directMemOff;
 uintptr_t videoMemSP;
-char **frameBuffers;
+uint32_t **frameBuffers;
 int frameBufferSize;
 OrbisVideoOutBufferAttribute attr;
 int activeFrameBufferIdx;
@@ -57,10 +57,10 @@ uint32_t RGB8_to_FBCOLOR(char r, char g, char b) {
 	return 0x80000000 + (r << 16) + (g << 8) + (b);
 }
 
-char *allocateDisplayMem(size_t size)
+uint32_t *allocateDisplayMem(size_t size)
 {
 	// Essentially just bump allocation
-	char *allocatedPtr = (char *)videoMemSP;
+	uint32_t *allocatedPtr = (uint32_t *)videoMemSP;
 	videoMemSP += size;
 
 	return allocatedPtr;
@@ -69,14 +69,14 @@ char *allocateDisplayMem(size_t size)
 int allocateFrameBuffers(int num)
 {
 	// Allocate frame buffers array
-	frameBuffers = malloc(sizeof(char *) * num);
+	frameBuffers = malloc(sizeof(uint32_t *) * num);
 	
 	// Set the display buffers
 	for(int i = 0; i < num; i++)
 		frameBuffers[i] = allocateDisplayMem(frameBufferSize);
 
 	// Set SRGB pixel format
-	sceVideoOutSetBufferAttribute(&attr, 0x80000000, 1, 0, 1920, 1080, 1920);
+	sceVideoOutSetBufferAttribute(&attr, 0x80000000, 1, 0, BASEWIDTH, BASEHEIGHT, BASEWIDTH);
 	
 	// Register the buffers to the video handle
 	return (sceVideoOutRegisterBuffers(ps4video, 0, (void **)frameBuffers, num, &attr) == 0);
@@ -242,7 +242,7 @@ void	VID_SetPalette (unsigned char *palette)
 {
 	int i;
 	unsigned char *pal = palette;
-	unsigned short *table = d_8to16table;
+	unsigned *table = d_8to24table;
 	unsigned r, g, b;
 	for(i=0; i<256; i++){
 		r = pal[0];
@@ -292,7 +292,7 @@ void	VID_Update (vrect_t *rects)
 	int x,y;
 	for(x = rects->x; x < rects->width; x++){
 		for(y = rects->x; y < rects->height; y++){
-			frameBuffers[activeFrameBufferIdx][((x*BASEWIDTH) + (BASEHEIGHT -y))] = d_8to16table[vid_buffer[y*BASEWIDTH + x]];
+			frameBuffers[activeFrameBufferIdx][((y * BASEWIDTH) + x)] = d_8to24table[vid_buffer[y*BASEWIDTH + x]];
 		}
 	}
 

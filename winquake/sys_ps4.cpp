@@ -184,6 +184,7 @@ void Sys_Printf (char *fmt, ...)
 
 void Sys_Quit (void)
 {
+	printf("Setting Sys_Quit!\n");
 	exit (0);
 }
 
@@ -241,7 +242,7 @@ int main (int argc, char **argv)
 
 	memset (&parms, 0, sizeof(parms));
 
-	parms.memsize = 16384*1024;
+	parms.memsize = 16*1024*1024;
 	parms.membase = malloc (parms.memsize);
 
 
