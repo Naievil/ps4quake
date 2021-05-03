@@ -1,5 +1,5 @@
 TOOLCHAIN   := $(OO_PS4_TOOLCHAIN)
-PROJDIR     := $(shell basename $(CURDIR))
+PROJDIR     := winquake
 INTDIR      := $(PROJDIR)/x64/Debug
 
 # Libraries linked into the ELF.

@@ -3,7 +3,7 @@
   <volume>
     <volume_type>pkg_ps4_app</volume_type>
     <volume_ts>2020-05-14 23:15:00</volume_ts>
-    <package content_id="IV0000-BREW00083_00-HELLOWORLD000000" passcode="00000000000000000000000000000000" storage_type="digital50" app_type="full" />
+    <package content_id="IV0000-BREW01996_00-QUAKEWORLD000000" passcode="00000000000000000000000000000000" storage_type="digital50" app_type="full" />
     <chunk_info chunk_count="1" scenario_count="1">
       <chunks>
         <chunk id="0" layer_no="0" label="Chunk #0" />
