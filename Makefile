@@ -3,7 +3,7 @@ PROJDIR     := winquake
 INTDIR      := $(PROJDIR)/x64/Debug
 
 # Libraries linked into the ELF.
-LIBS        := -lc -lkernel -lc++
+LIBS        := -lc -lkernel -lc++ -lSceVideoOut
 
 # Compiler options. You likely won't need to touch these.
 UNAME_S := $(shell uname -s)

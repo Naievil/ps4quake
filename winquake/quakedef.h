@@ -334,6 +334,11 @@ void Chase_Init (void);
 void Chase_Reset (void);
 void Chase_Update (void);
 
+#include <errno.h>
+#include <stdint.h>
+#include <orbis/libkernel.h>
+#include <orbis/VideoOut.h>
+#include <orbis/Sysmodule.h>
 
 #define false 0 
 #define true 1
