@@ -1,0 +1,105 @@
+/*
+Copyright (C) 1996-1997 Id Software, Inc.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+*/
+// snd_ps4.c -- main control for any streaming sound output device
+
+#include "quakedef.h"
+
+#include <orbis/libkernel.h>
+#include <orbis/AudioOut.h>
+#include <orbis/UserService.h>
+
+int32_t ps4audio = 0;
+unsigned char *audiobuffer;
+uint64_t initial_tick;
+#define QUAKE_SAMPLERATE 32000
+#define TICKS_PER_SEC 268111856LL
+uint32_t SAMPLERATE = QUAKE_SAMPLERATE<<1;
+
+qboolean SNDDMA_Init(void) {
+	
+	int rc;
+	OrbisUserServiceUserId userId = ORBIS_USER_SERVICE_USER_ID_SYSTEM;
+
+    sceUserServiceInitialize(NULL);
+
+    // Initialize audio output library
+    rc = sceAudioOutInit();
+
+    if (rc != 0)
+    {
+        Sys_Error("[ERROR] Failed to initialize audio output\n");
+    }
+
+    // Open a handle to audio output device
+    ps4audio = sceAudioOutOpen(userId, ORBIS_AUDIO_OUT_PORT_TYPE_MAIN, 0, 256, 48000, ORBIS_AUDIO_OUT_PARAM_FORMAT_S16_STEREO);
+
+    if (ps4audio <= 0)
+    {
+        Sys_Error("[ERROR] Failed to open audio on main port\n");
+    }
+
+    audiobuffer = malloc(16384);
+
+    /* Fill the audio DMA information block */
+    shm = &sn;
+    shm->splitbuffer = 0;
+    shm->samplebits = 16;
+    shm->speed = QUAKE_SAMPLERATE;
+    SAMPLERATE = QUAKE_SAMPLERATE;
+    shm->channels = 2;
+    shm->samples = 16384;    
+    shm->samplepos = 0;
+    shm->submission_chunk = 1;
+    shm->buffer = audiobuffer;
+
+    initial_tick = cl.time;
+
+    return true;
+}
+
+int SNDDMA_GetDMAPos(void)
+{
+    if(!snd_initialized)
+        return 0;
+
+    uint64_t delta = (cl.time - initial_tick);
+    uint64_t samplepos = delta * (SAMPLERATE) / TICKS_PER_SEC;
+    shm->samplepos = samplepos;
+    return samplepos;
+}
+
+void SND_Update_PS4(void) {
+
+    /* Output audio */
+    sceAudioOutOutput(ps4audio, NULL); // NULL: wait for completion
+
+    if (sceAudioOutOutput(ps4audio, audiobuffer) < 0) {
+
+        Sys_Error("Failed to output audio\n");
+    }
+}
+
+void SNDDMA_Submit(void) {
+    SND_Update_PS4();
+}
+
+void SNDDMA_Shutdown(void) {
+    // deconstruct here
+};
