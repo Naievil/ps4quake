@@ -190,11 +190,8 @@ void Sys_Quit (void)
 
 double Sys_FloatTime (void)
 {
-	static double t;
-	
-	t += 0.1;
-	
-	return t;
+	double timer = (double)sceKernelGetProcessTimeCounter();
+	return (timer/(1000*1000*1000));
 }
 
 char *Sys_ConsoleInput (void)
@@ -264,20 +261,21 @@ int main (int argc, char **argv)
 	parms.argc = argc;
 	parms.argv = argv;
 
-	printf ("Host_Init\n");
 	Host_Init (&parms);
 
-	oldtime = Sys_FloatTime ();
+	oldtime = Sys_FloatTime() -0.1;
 
     // main window message loop //
 	while (1)
 	{
 		time = Sys_FloatTime();
+		/*
 		if (time - oldtime < sys_ticrate.value )
 		{
 			Sleep(1);
 			continue;
 		}
+		*/
 
 		Host_Frame ( time - oldtime );
 		oldtime = time;

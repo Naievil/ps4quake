@@ -500,20 +500,24 @@ qboolean Host_FilterTime (float time)
 {
 	realtime += time;
 
-	if (!cls.timedemo && realtime - oldrealtime < 1.0/72.0)
+	if (!cls.timedemo && realtime - oldrealtime < 1.0/72.0) {
 		return false;		// framerate is too high
+	}
 
-	host_frametime = realtime - oldrealtime;
+	host_frametime = (double)(realtime - oldrealtime);
 	oldrealtime = realtime;
 
-	if (host_framerate.value > 0)
+	if (host_framerate.value > 0) {
 		host_frametime = host_framerate.value;
+	}
 	else
 	{	// don't allow really long or short frames
-		if (host_frametime > 0.1)
+		if (host_frametime > 0.1) {
 			host_frametime = 0.1;
-		if (host_frametime < 0.001)
+		}
+		if (host_frametime < 0.001) {
 			host_frametime = 0.001;
+		}
 	}
 	
 	return true;

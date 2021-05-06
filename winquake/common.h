@@ -24,6 +24,9 @@ typedef unsigned char 		byte;
 #define BYTE_DEFINED 1
 #endif
 
+#define	q_min(a, b)	(((a) < (b)) ? (a) : (b))
+#define	q_max(a, b)	(((a) > (b)) ? (a) : (b))
+
 #undef true
 #undef false
 
